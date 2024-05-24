@@ -1,0 +1,25 @@
+name: Push to ACR
+
+on:
+  push:
+    branches: ["main"]
+
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest # or self-hosted runner if used
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: azure/docker-login@v1
+        with:
+          login-server: <INSERT-SUBDOMAIN>.azurecr.io
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+
+      - run: |
+          docker build . -t <INSERT-SUBDOMAIN>.AZURECR.IO/<INSERT-REPOSITORY-NAME>:${{ github.sha }} 
+          docker push <INSERT-SUBDOMAIN>.AZURECR.IO/<INSERT-REPOSITORY-NAME>:${{ github.sha }} 
